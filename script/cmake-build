@@ -135,6 +135,15 @@ main()
         exit 1
     fi
 
+    for option in "$@"; do
+        if [ "${option}" == "-DOT_RPC=ON" ] && [ "${PW_ROOT:=""}" == "" ]; then
+            set +euxo pipefail
+            source ${OT_PIGWEED_DIR}/bootstrap.sh
+            set -euxo pipefail
+        fi
+    done
+
+
     local platform="$1"
     # Check if the platform supports cmake.
     echo "${OT_PLATFORMS[@]}" | grep -wq "${platform}" || die "${platform}"
@@ -145,7 +154,6 @@ main()
         "-DOT_PLATFORM=${platform}"
         "-DOT_SLAAC=ON"
     )
-
     case "${platform}" in
         posix)
             local_options+=(
@@ -155,7 +163,9 @@ main()
             options+=("${OT_POSIX_SIM_COMMON_OPTIONS[@]}" "${local_options[@]}")
             ;;
         simulation)
-            local_options=("-DOT_LINK_RAW=ON")
+            local_options=(
+                "-DOT_LINK_RAW=ON"
+            )
             options+=("${OT_POSIX_SIM_COMMON_OPTIONS[@]}" "${local_options[@]}")
             ;;
         cc2538)

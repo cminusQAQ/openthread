@@ -311,7 +311,6 @@ void otSysMainloopUpdate(otInstance *aInstance, otSysMainloopContext *aMainloop)
 int otSysMainloopPoll(otSysMainloopContext *aMainloop)
 {
     int rval;
-
 #if OPENTHREAD_POSIX_VIRTUAL_TIME
     if (timerisset(&aMainloop->mTimeout))
     {
@@ -350,10 +349,11 @@ int otSysMainloopPoll(otSysMainloopContext *aMainloop)
 
     return rval;
 }
-
+#include "common/logging.hpp"
 void otSysMainloopProcess(otInstance *aInstance, const otSysMainloopContext *aMainloop)
 {
     ot::Posix::Mainloop::Manager::Get().Process(*aMainloop);
+    //  otLogCritMle("otSysMainloopProcess\n");
 
 #if OPENTHREAD_POSIX_VIRTUAL_TIME
     virtualTimeProcess(aInstance, &aMainloop->mReadFdSet, &aMainloop->mWriteFdSet, &aMainloop->mErrorFdSet);

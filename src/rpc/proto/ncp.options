@@ -1,0 +1,4 @@
+ot.Rpc.StatusResponse.mNetworkName max_size:16
+ot.Rpc.ScanResponse.mNetworkName max_size:16
+ot.Rpc.ScanResponse.mSteeringData max_size:16
+ot.Rpc.Dataset.mTlvs max_size:254

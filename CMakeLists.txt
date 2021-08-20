@@ -41,7 +41,7 @@ option(OT_MBEDTLS_THREADING "enable mbedtls threading" OFF)
 
 add_library(ot-config INTERFACE)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 99)
 
 message(STATUS "OpenThread Source Directory: ${PROJECT_SOURCE_DIR}")
@@ -77,7 +77,8 @@ endif ()
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "(Apple)?[Cc]lang")
     option(OT_COMPILE_WARNING_AS_ERROR "whether to include -Werror -pedantic-errors with gcc-compatible compilers")
     if (OT_COMPILE_WARNING_AS_ERROR)
-        set(OT_CFLAGS -Werror -pedantic-errors)
+	    #set(OT_CFLAGS -Werror -pedantic-errors)
+        set(OT_CFLAGS -Werror)
     endif()
 
     if(OT_COVERAGE)

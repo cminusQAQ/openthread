@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package ot.Rpc;
+
+message StatusResponse {
+
+  bytes  mNetworkName     = 1;
+  uint32 mChannel         = 2;
+  uint32 mDeviceRole      = 3;
+  uint32 mPanId           = 4;
+  uint64 mExtPanId        = 5;
+  uint64 mExtendedAddress = 6;
+  uint32 mRloc16          = 7;
+}
+
+message ScanResponse {
+  uint64 mExtAddress    = 1;            ///< IEEE 802.15.4 Extended Address
+  bytes  mNetworkName   = 2;            ///< Thread Network Name
+  uint64 mExtendedPanId = 3;            ///< Thread Extended PAN ID
+  bytes  mSteeringData  = 4;            ///< Steering Data
+  uint32 mPanId         = 5;            ///< IEEE 802.15.4 PAN ID
+  uint32 mJoinerUdpPort = 6;            ///< Joiner UDP Port
+  uint32 mChannel       = 7;            ///< IEEE 802.15.4 Channel
+  int32  mRssi          = 8;            ///< RSSI (dBm)
+  uint32 mLqi           = 9;            ///< LQI
+  uint32 mVersion       = 10;           ///< Version
+  bool   mIsNative      = 11;           ///< Native Commissioner flag
+  bool   mIsJoinable    = 12;           ///< Joining Permitted flag
+}
+
+
+message Dataset {
+  bytes mTlvs = 1;
+}
+
+message Empty {}
+
+service NcpService {
+  rpc Status(Empty) returns (StatusResponse);
+  rpc Scan(Empty) returns (stream ScanResponse);
+  rpc Attach(Dataset) returns (Empty);
+  rpc Detach(Empty) returns (Empty);
+}

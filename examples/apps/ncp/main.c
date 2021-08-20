@@ -35,6 +35,7 @@
 #include <openthread/tasklet.h>
 
 #include "openthread-system.h"
+#include "syslog.h"
 
 /**
  * This function initializes the NCP app.
@@ -114,13 +115,11 @@ pseudo_reset:
     assert(instance);
 
     otAppNcpInit(instance);
-
     while (!otSysPseudoResetWasRequested())
     {
         otTaskletsProcess(instance);
         otSysProcessDrivers(instance);
     }
-
     otInstanceFinalize(instance);
 #if OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE
     free(otInstanceBuffer);

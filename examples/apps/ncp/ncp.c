@@ -32,6 +32,7 @@
 
 #include "common/code_utils.hpp"
 
+#include "syslog.h"
 #include "ncp/ncp_config.h"
 
 #if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
@@ -53,6 +54,7 @@ void otPlatUartSendDone(void)
 static int NcpSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
     IgnoreError(otPlatUartSend(aBuf, aBufLength));
+    otPlatUartFlush();
     return aBufLength;
 }
 #endif
@@ -63,7 +65,6 @@ void otAppNcpInit(otInstance *aInstance)
     otNcpSpiInit(aInstance);
 #else
     IgnoreError(otPlatUartEnable());
-
     otNcpHdlcInit(aInstance, NcpSend);
 #endif
 }

@@ -35,6 +35,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
 
@@ -166,9 +167,7 @@ otError otPlatUartDisable(void)
 otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 {
     otError error = OT_ERROR_NONE;
-
     otEXPECT_ACTION(s_write_length == 0, error = OT_ERROR_BUSY);
-
     s_write_buffer = aBuf;
     s_write_length = aBufLength;
 
@@ -213,14 +212,11 @@ otError otPlatUartFlush(void)
 {
     otError error = OT_ERROR_NONE;
     ssize_t count;
-
     otEXPECT_ACTION(s_write_buffer != NULL && s_write_length > 0, error = OT_ERROR_INVALID_STATE);
-
     while ((count = write(s_out_fd, s_write_buffer, s_write_length)) > 0 && (s_write_length -= count) > 0)
     {
         s_write_buffer += count;
     }
-
     if (count != -1)
     {
         assert(s_write_length == 0);
@@ -278,10 +274,8 @@ void platformUartProcess(void)
                 perror("read");
                 exit(EXIT_FAILURE);
             }
-
             otPlatUartReceived(s_receive_buffer, (uint16_t)rval);
         }
-
         if ((s_write_length > 0) && (pollfd[1].revents & POLLOUT))
         {
             rval = write(s_out_fd, s_write_buffer, s_write_length);

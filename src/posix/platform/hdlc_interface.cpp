@@ -176,17 +176,17 @@ otError HdlcInterface::Init(const Url::Url &aRadioUrl)
 exit:
     return error;
 }
-
+// TODO:
 HdlcInterface::~HdlcInterface(void)
 {
     Deinit();
 }
-
+// TODO:
 void HdlcInterface::Deinit(void)
 {
     CloseFile();
 }
-
+// TODO:
 void HdlcInterface::Read(void)
 {
     uint8_t buffer[kMaxFrameSize];
@@ -196,6 +196,7 @@ void HdlcInterface::Read(void)
 
     if (rval > 0)
     {
+        // TODO: HandleReceive()
         Decode(buffer, static_cast<uint16_t>(rval));
     }
     else if ((rval < 0) && (errno != EAGAIN) && (errno != EINTR))
@@ -225,6 +226,7 @@ exit:
     return error;
 }
 
+// TODO:
 otError HdlcInterface::Write(const uint8_t *aFrame, uint16_t aLength)
 {
     otError error = OT_ERROR_NONE;
@@ -327,7 +329,7 @@ otError HdlcInterface::WaitForFrame(uint64_t aTimeoutUs)
 exit:
     return error;
 }
-
+// TODO:
 void HdlcInterface::UpdateFdSet(fd_set &aReadFdSet, fd_set &aWriteFdSet, int &aMaxFd, struct timeval &aTimeout)
 {
     OT_UNUSED_VARIABLE(aWriteFdSet);
@@ -340,7 +342,7 @@ void HdlcInterface::UpdateFdSet(fd_set &aReadFdSet, fd_set &aWriteFdSet, int &aM
         aMaxFd = mSockFd;
     }
 }
-
+// TODO:
 void HdlcInterface::Process(const RadioProcessContext &aContext)
 {
     if (FD_ISSET(mSockFd, aContext.mReadFdSet))
@@ -409,6 +411,7 @@ exit:
     return error;
 }
 
+// TODO:
 int HdlcInterface::OpenFile(const Url::Url &aRadioUrl)
 {
     int fd   = -1;

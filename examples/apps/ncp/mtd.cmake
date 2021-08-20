@@ -44,3 +44,5 @@ target_link_libraries(ot-ncp-mtd PRIVATE
 )
 
 install(TARGETS ot-ncp-mtd DESTINATION bin)
+
+

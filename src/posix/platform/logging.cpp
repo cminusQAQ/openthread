@@ -67,6 +67,14 @@ void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char *aFormat
         aLogLevel = LOG_DEBUG;
         break;
     }
+    {
+        struct timeval  tv;
+        struct timezone tz;
+        gettimeofday(&tv, &tz);
+        fprintf(stdout, "%ld.%ld ", tv.tv_sec, tv.tv_usec / 1000);
+        vfprintf(stdout, aFormat, args);
+        fprintf(stdout, "\r\n");
+    }
 
     va_start(args, aFormat);
     vsyslog(aLogLevel, aFormat, args);

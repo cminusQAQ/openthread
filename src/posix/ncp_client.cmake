@@ -26,26 +26,38 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-add_library(openthread-ftd)
 
-target_compile_definitions(openthread-ftd PRIVATE
-    OPENTHREAD_FTD=1
+add_executable(ot-ncp-client
+    NcpClient.cpp
+    platform/uart.cpp
 )
 
-target_compile_options(openthread-ftd PRIVATE
+target_include_directories(ot-ncp-client
+    PRIVATE 
+    ${COMMON_INCLUDES}
+    ${PROJECT_SOURCE_DIR}/src/posix/platform/include/openthread
+    ${PROJECT_SOURCE_DIR}/src/posix/platform/include
+    ${PROJECT_SOURCE_DIR}/src/posix/platform
+)
+
+target_compile_options(ot-ncp-client PRIVATE
     ${OT_CFLAGS}
 )
 
-target_include_directories(openthread-ftd PUBLIC ${OT_PUBLIC_INCLUDES} PRIVATE ${COMMON_INCLUDES})
 
-target_sources(openthread-ftd PRIVATE ${COMMON_SOURCES})
-
-target_link_libraries(openthread-ftd
-    PRIVATE
-        pw_hdlc
-	pw_rpc.server
-	pw_rpc.client
-        ${OT_MBEDTLS}
-        tcplp
-        ot-config
+target_link_libraries(ot-ncp-client
+    pw_hdlc
+    pw_stream
+    util
+    openthread-ncp-cli
+    openthread-rpc-client
+    openthread-platform
+    pw_protobuf
+    openthread-url
+    pw_rpc.ncp_proto.nanopb
+    pw_rpc.ncp_proto.nanopb_rpc
+    ot-config
 )
+
+install(TARGETS ot-ncp-client DESTINATION bin)
+

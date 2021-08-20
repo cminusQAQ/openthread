@@ -127,7 +127,6 @@ pseudo_reset:
     instance = otInstanceInitSingle();
 #endif
     assert(instance);
-
     otAppCliInit(instance);
 
 #if OPENTHREAD_POSIX && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)

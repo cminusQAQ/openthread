@@ -36,6 +36,7 @@
 
 #include "openthread-core-config.h"
 
+#include <syslog.h>
 #include "common/code_utils.hpp"
 #include "common/debug.hpp"
 #include "common/encoding.hpp"
@@ -73,6 +74,7 @@ public:
      */
     bool Get(uint16_t aIndex) const
     {
+        syslog(LOG_CRIT, "aIndex: %d N: %d", aIndex, N);
         OT_ASSERT(aIndex < N);
         return (mMask[aIndex / 8] & (0x80 >> (aIndex % 8))) != 0;
     }

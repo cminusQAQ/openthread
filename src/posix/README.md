@@ -155,6 +155,24 @@ python cc2538-bsl/cc2538-bsl.py -b 460800 -e -w -v -p /dev/ttyUSB0 ot-rcp.bin
 ./build/posix/src/posix/ot-cli 'spinel+hdlc+uart:///dev/ttyUSB0?uart-baudrate=115200'
 ```
 
+### RPC Based NCP
+
+Openthread RPC based NCP mode use the pigweed RPC to implement RPC. Before use this mode in a new console, please enter the directory where pigweed is located and run the command ```source ./bootstrap.sh``` if your operating system is linux. You can find the detail information about pigweed in [this website](https://pigweed.dev/).
+
+#### Build
+
+you must use the following format to specify the path of pigweed and nanopb and let the option OT_RPC be on.
+
+```sh
+OT_PIGWEED_DIR="path/to/pigweed" OT_NANOPB_DIR="path/to/nanopb" ./script/cmake-build posix -DOT_RPC=ON
+```
+
+#### Run
+
+```sh
+./build/posix/src/posix/ot-ncp-client 'spinel+hdlc+forkpty://build/simulation/examples/apps/ncp/ot-ncp-mtd-rpc?forkpty-arg=1'
+```
+
 ## Daemon Mode
 
 OpenThread Posix Daemon mode uses a unix socket as input and output, so that OpenThread core can run as a service. And a client can communicate with it by connecting to the socket. The protocol is OpenThread CLI.

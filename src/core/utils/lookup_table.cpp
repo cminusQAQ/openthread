@@ -31,9 +31,9 @@
  *   This file implements the lookup table (binary search) functionality.
  */
 
-#include <string.h>
-
 #include "lookup_table.hpp"
+#include <cstdio>
+#include <string.h>
 
 #include "common/code_utils.hpp"
 
@@ -49,7 +49,6 @@ const void *LookupTable::Find(const char *aName,
     const void *entry;
     uint16_t    left  = 0;
     uint16_t    right = aLength;
-
     while (left < right)
     {
         uint16_t middle = (left + right) / 2;
@@ -67,7 +66,6 @@ const void *LookupTable::Find(const char *aName,
         entry = reinterpret_cast<const uint8_t *>(aTable) + aTableEntrySize * middle;
 
         compare = strcmp(aName, aNameGetter(entry));
-
         if (compare == 0)
         {
             ExitNow();
