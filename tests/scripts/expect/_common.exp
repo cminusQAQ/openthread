@@ -106,6 +106,10 @@ proc spawn_node {id {type ""} {radio_url ""}} {
             wait_for "state" "disabled"
             expect_line "Done"
         }
+        rpc {
+            set radio_url "spinel+hdlc+uart://$::env(OT_SIMULATION_APPS)/ncp/ot-ncp-mtd-rpc?forkpty-arg=$id"
+            spawn /usr/bin/env GCOV_PREFIX=$gcov_prefix $::env(OT_POSIX_APPS)/ot-ncp-client $radio_url
+        }
     }
 
     expect_after {

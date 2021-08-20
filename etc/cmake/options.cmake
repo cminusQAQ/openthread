@@ -371,6 +371,11 @@ else()
     message(FATAL_ERROR "Invalid max RCP restoration count: ${OT_RCP_RESTORATION_MAX_COUNT}")
 endif()
 
+option(OT_RPC "enable RPC")
+if (OT_RPC)
+    target_compile_definitions(ot-config INTERFACE "OPENTHREAD_CONFIG_RPC_ENABLE=1")
+endif()
+
 # Checks
 if(OT_PLATFORM_UDP AND OT_UDP_FORWARD)
     message(FATAL_ERROR "OT_PLATFORM_UDP and OT_UDP_FORWARD are exclusive")

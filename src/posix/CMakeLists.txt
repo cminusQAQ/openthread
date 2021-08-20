@@ -32,6 +32,7 @@ set(COMMON_INCLUDES
     ${PROJECT_SOURCE_DIR}/src/core
     ${PROJECT_SOURCE_DIR}/src/posix/platform
     ${PROJECT_SOURCE_DIR}/src/posix/platform/include
+    ${PROJECT_SOURCE_DIR}/src/rpc
 )
 
 set(OT_READLINE_VALUES
@@ -81,6 +82,10 @@ elseif(OT_APP_CLI)
     if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         set(CPACK_PACKAGE_NAME "openthread-standalone")
     endif()
+endif()
+
+if (OT_RPC)
+    include(ncp_client.cmake)
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

@@ -26,48 +26,44 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "openthread-core-config.h"
+syntax = "proto3";
 
-#include <openthread/ncp.h>
+package ot.Rpc;
 
-#include "common/code_utils.hpp"
-
-#include "ncp/ncp_config.h"
-
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-#include "utils/uart.h"
-
-void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
-{
-    otNcpHdlcReceive(aBuf, aBufLength);
+message StatusResponse {
+  bytes  mNetworkName     = 1;  ///< Thread Network Name
+  uint32 mChannel         = 2;  ///< IEEE 802.15.4 Channel
+  uint32 mDeviceRole      = 3;  ///< Current Thread role
+  uint32 mPanId           = 4;  ///< IEEE 802.15.4 PAN ID
+  uint64 mExtPanId        = 5;  ///< Thread Extended PAN ID
+  uint64 mExtendedAddress = 6;  ///< IEEE 802.15.4 Extended Address
+  uint32 mRloc16          = 7;  ///< The Server RLOC16
 }
 
-void otPlatUartSendDone(void)
-{
-    otNcpHdlcSendDone();
+message ScanResponse {
+  uint64 mExtAddress    = 1;  ///< IEEE 802.15.4 Extended Address
+  bytes  mNetworkName   = 2;  ///< Thread Network Name
+  uint64 mExtendedPanId = 3;  ///< Thread Extended PAN ID
+  bytes  mSteeringData  = 4;  ///< Steering Data
+  uint32 mPanId         = 5;  ///< IEEE 802.15.4 PAN ID
+  uint32 mJoinerUdpPort = 6;  ///< Joiner UDP Port
+  uint32 mChannel       = 7;  ///< IEEE 802.15.4 Channel
+  int32  mRssi          = 8;  ///< RSSI (dBm)
+  uint32 mLqi           = 9;  ///< LQI
+  uint32 mVersion       = 10; ///< Version
+  bool   mIsNative      = 11; ///< Native Commissioner flag
+  bool   mIsJoinable    = 12; ///< Joining Permitted flag
 }
-#endif
 
-#if !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-static int NcpSend(const uint8_t *aBuf, uint16_t aBufLength)
-{
-    IgnoreError(otPlatUartSend(aBuf, aBufLength));
-#if OPENTHREAD_CONFIG_RPC_ENABLE
-    otPlatUartFlush();
-#endif
-    return aBufLength;
+message Dataset {
+  bytes mTlvs = 1;
 }
-#endif
 
-void otAppNcpInit(otInstance *aInstance)
-{
-#if OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-    otNcpSpiInit(aInstance);
-#else
-    IgnoreError(otPlatUartEnable());
+message Empty {}
 
-    otNcpHdlcInit(aInstance, NcpSend);
-#endif
+service NcpService {
+  rpc Status(Empty) returns (StatusResponse);
+  rpc Scan(Empty) returns (stream ScanResponse);
+  rpc Attach(Dataset) returns (Empty);
+  rpc Detach(Empty) returns (Empty);
 }
-#endif // !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK

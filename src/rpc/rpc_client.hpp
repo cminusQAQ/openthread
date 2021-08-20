@@ -26,48 +26,60 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "openthread-core-config.h"
+#include "pw_hdlc/rpc_channel.h"
+#include "pw_hdlc/rpc_packets.h"
+#include "pw_rpc/channel.h"
+#include "pw_rpc/client.h"
 
-#include <openthread/ncp.h>
+#include "rpc_channel_output.hpp"
+#include "rpc_config.h"
+#include "pw_rpc/channel.h"
+#include "pw_status/status.h"
+#include "pw_stream/sys_io_stream.h"
 
-#include "common/code_utils.hpp"
+namespace ot {
+namespace Rpc {
 
-#include "ncp/ncp_config.h"
-
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-#include "utils/uart.h"
-
-void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
+class RpcClient
 {
-    otNcpHdlcReceive(aBuf, aBufLength);
-}
+public:
+    /**
+     * This constructor initializes the object.
+     *
+     * @param[in]  aInstance  The OpenThread instance structure.
+     * @param[in]  aWriter    A pigweed stream writer structure.
+     *
+     */
+    RpcClient(pw::stream::Writer *aWriter);
 
-void otPlatUartSendDone(void)
-{
-    otNcpHdlcSendDone();
-}
-#endif
+    /**
+     * This method will be called to process an RPC packet when the transport layer receives one.
+     *
+     * @param[in] aBuffer       A pointer to string.
+     * @param[in] aLength       The length of the string.
+     *
+     */
+    void ProcessPackets(const uint8_t *aBuffer, uint16_t aLength);
 
-#if !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-static int NcpSend(const uint8_t *aBuf, uint16_t aBufLength)
-{
-    IgnoreError(otPlatUartSend(aBuf, aBufLength));
-#if OPENTHREAD_CONFIG_RPC_ENABLE
-    otPlatUartFlush();
-#endif
-    return aBufLength;
-}
-#endif
+    /**
+     * This method will provide the channel stored in mChannel.
+     *
+     * @returns  The channel stored in mChannel.
+     *
+     */
+    pw::rpc::Channel &GetChannel(void);
 
-void otAppNcpInit(otInstance *aInstance)
-{
-#if OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-    otNcpSpiInit(aInstance);
-#else
-    IgnoreError(otPlatUartEnable());
+private:
+    enum
+    {
+        kMaxBufferSize = OPENTHREAD_CONFIG_RPC_MAX_BUFFER_SIZE,
+    };
+    RpcChannelOutput                      mChannelOutput;
+    pw::rpc::Channel                      mChannels[1];
+    pw::rpc::Client                       mClient;
+    pw::hdlc::Decoder                     mDecoder;
+    std::array<std::byte, kMaxBufferSize> mDecodeBuffer;
+};
 
-    otNcpHdlcInit(aInstance, NcpSend);
-#endif
-}
-#endif // !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
+} // namespace Rpc
+} // namespace ot

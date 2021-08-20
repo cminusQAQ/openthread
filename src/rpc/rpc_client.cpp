@@ -26,48 +26,42 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "openthread-core-config.h"
+#include "rpc_client.hpp"
+#include "common.hpp"
 
-#include <openthread/ncp.h>
+namespace ot {
+namespace Rpc {
 
-#include "common/code_utils.hpp"
-
-#include "ncp/ncp_config.h"
-
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-#include "utils/uart.h"
-
-void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
+RpcClient::RpcClient(pw::stream::Writer *aWriter)
+    : mChannelOutput(*aWriter, pw::hdlc::kDefaultRpcAddress, "HDLC output")
+    , mChannels{pw::rpc::Channel::Create<1>(&mChannelOutput)}
+    , mClient(mChannels)
+    , mDecoder(mDecodeBuffer)
 {
-    otNcpHdlcReceive(aBuf, aBufLength);
 }
 
-void otPlatUartSendDone(void)
+void RpcClient::ProcessPackets(const uint8_t *aBuffer, uint16_t aLength)
 {
-    otNcpHdlcSendDone();
-}
-#endif
+    for (uint16_t i = 0; i < aLength; i++)
+    {
+        std::byte data = (std::byte)aBuffer[i];
 
-#if !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-static int NcpSend(const uint8_t *aBuf, uint16_t aBufLength)
+        if (auto result = mDecoder.Process(data); result.ok())
+        {
+            pw::hdlc::Frame &frame = result.value();
+
+            if (frame.address() == pw::hdlc::kDefaultRpcAddress)
+            {
+                mClient.ProcessPacket(frame.data());
+            }
+        }
+    }
+}
+
+pw::rpc::Channel &RpcClient::GetChannel(void)
 {
-    IgnoreError(otPlatUartSend(aBuf, aBufLength));
-#if OPENTHREAD_CONFIG_RPC_ENABLE
-    otPlatUartFlush();
-#endif
-    return aBufLength;
+    return mChannels[0];
 }
-#endif
 
-void otAppNcpInit(otInstance *aInstance)
-{
-#if OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-    otNcpSpiInit(aInstance);
-#else
-    IgnoreError(otPlatUartEnable());
-
-    otNcpHdlcInit(aInstance, NcpSend);
-#endif
-}
-#endif // !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
+} // namespace Rpc
+} // namespace ot

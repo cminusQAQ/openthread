@@ -179,6 +179,32 @@ jobs:
         name: cov-ncp-rcp-migrate
         path: tmp/coverage.info
 
+  rpc-based-ncp:
+    runs-on: ubuntu-20.04
+    env:
+      THREAD_VERSION: 1.2
+      COVERAGE: 1
+      OT_DAEMON: ${{ matrix.OT_DAEMON }}
+      CFLAGS: -DCLI_COAP_SECURE_USE_COAP_DEFAULT_HANDLER=1 -DOPENTHREAD_CONFIG_MLE_MAX_CHILDREN=15
+      CXXFLAGS: -DCLI_COAP_SECURE_USE_COAP_DEFAULT_HANDLER=1 -DOPENTHREAD_CONFIG_MLE_MAX_CHILDREN=15
+    steps:
+    - uses: actions/checkout@v2
+    - name: Bootstrap
+      run: |
+        git clone https://pigweed.googlesource.com/pigweed/pigweed
+        git clone https://github.com/nanopb/nanopb.git
+        sudo apt-get --no-install-recommends install -y expect ninja-build lcov socat
+    - name: Build
+      run: |
+        ./script/test prepare_coredump_upload
+        cd pigweed
+        source ./bootstrap.sh
+        cd ..
+        rm -rf build
+        export OT_PIGWEED_DIR="`pwd`/pigweed" 
+        export OT_NANOPB_DIR="`pwd`/nanopb"
+        ./script/test build_rpc expect tests/scripts/expect/cli-rpc.exp
+
   pty-linux:
     name: pty-linux OT_DAEMON=${{ matrix.OT_DAEMON }}
     runs-on: ubuntu-20.04

@@ -26,48 +26,12 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "openthread-core-config.h"
-
-#include <openthread/ncp.h>
-
-#include "common/code_utils.hpp"
-
-#include "ncp/ncp_config.h"
-
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-#include "utils/uart.h"
-
-void otPlatUartReceived(const uint8_t *aBuf, uint16_t aBufLength)
-{
-    otNcpHdlcReceive(aBuf, aBufLength);
-}
-
-void otPlatUartSendDone(void)
-{
-    otNcpHdlcSendDone();
-}
+/**
+ * @def OPENTHREAD_CONFIG_RPC_MAX_BUFFER_SIZE
+ *
+ * The maximum size of a rpc buffer.
+ *
+ */
+#ifndef OPENTHREAD_CONFIG_RPC_MAX_BUFFER_SIZE
+#define OPENTHREAD_CONFIG_RPC_MAX_BUFFER_SIZE 1500
 #endif
-
-#if !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK
-#if !OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-static int NcpSend(const uint8_t *aBuf, uint16_t aBufLength)
-{
-    IgnoreError(otPlatUartSend(aBuf, aBufLength));
-#if OPENTHREAD_CONFIG_RPC_ENABLE
-    otPlatUartFlush();
-#endif
-    return aBufLength;
-}
-#endif
-
-void otAppNcpInit(otInstance *aInstance)
-{
-#if OPENTHREAD_CONFIG_NCP_SPI_ENABLE
-    otNcpSpiInit(aInstance);
-#else
-    IgnoreError(otPlatUartEnable());
-
-    otNcpHdlcInit(aInstance, NcpSend);
-#endif
-}
-#endif // !OPENTHREAD_ENABLE_NCP_VENDOR_HOOK

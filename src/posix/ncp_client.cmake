@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2019, The OpenThread Authors.
+#  Copyright (c) 2021, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,35 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-add_subdirectory(cli)
-add_subdirectory(core)
-add_subdirectory(lib)
-add_subdirectory(ncp)
-if(OT_RPC)
-    add_subdirectory(rpc)
-endif()
+add_executable(ot-ncp-client
+    NcpClient.cpp
+    platform/uart.cpp
+)
+
+target_include_directories(ot-ncp-client
+    PRIVATE 
+        ${COMMON_INCLUDES}
+        ${PROJECT_SOURCE_DIR}/src/posix/platform
+        ${PROJECT_SOURCE_DIR}/src/posix/platform/include
+        ${PROJECT_SOURCE_DIR}/src/posix/platform/include/openthread
+)
+
+target_compile_options(ot-ncp-client PRIVATE
+    ${OT_CFLAGS}
+)
+
+target_link_libraries(ot-ncp-client
+    openthread-ncp-cli
+    openthread-platform
+    openthread-rpc-client
+    openthread-url
+    ot-config
+    pw_hdlc
+    pw_protobuf
+    pw_rpc.ncp_proto.nanopb
+    pw_rpc.ncp_proto.nanopb_rpc
+    pw_stream
+    util
+)
+
+install(TARGETS ot-ncp-client DESTINATION bin)

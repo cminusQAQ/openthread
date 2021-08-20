@@ -148,6 +148,33 @@ build_posix()
     fi
 }
 
+do_build_rpc()
+{
+    local version="${THREAD_VERSION}"
+    local options=("-DOT_MESSAGE_USE_HEAP=ON" "-DOT_THREAD_VERSION=${version}" "-DBUILD_TESTING=ON" "-DOT_RPC=ON")
+
+    OT_CMAKE_BUILD_DIR="${OT_BUILDDIR}/openthread-posix-${version}" "${OT_SRCDIR}"/script/cmake-build posix "${options[@]}"
+
+    options=(
+        "-DBUILD_TESTING=ON"
+        "-DOT_DNS_CLIENT=ON"
+        "-DOT_DNSSD_SERVER=ON"
+        "-DOT_ECDSA=ON"
+        "-DOT_HISTORY_TRACKER=ON"
+        "-DOT_MESSAGE_USE_HEAP=ON"
+        "-DOT_NETDATA_PUBLISHER=ON"
+        "-DOT_PING_SENDER=ON"
+        "-DOT_REFERENCE_DEVICE=ON"
+        "-DOT_SERVICE=ON"
+        "-DOT_SRP_CLIENT=ON"
+        "-DOT_SRP_SERVER=ON"
+        "-DOT_THREAD_VERSION=${version}"
+        "-DOT_RPC=ON"
+    )
+
+    OT_CMAKE_BUILD_DIR="${OT_BUILDDIR}/openthread-simulation-${version}" "${OT_SRCDIR}"/script/cmake-build simulation "${options[@]}"
+}
+
 build_for_one_version()
 {
     local version="$1"
@@ -632,6 +659,9 @@ main()
                 ;;
             combine_coverage)
                 do_combine_coverage
+                ;;
+            build_rpc)
+                do_build_rpc
                 ;;
             *)
                 echo
