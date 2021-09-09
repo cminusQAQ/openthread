@@ -2,6 +2,7 @@
 
 ---
 
+
 # What is OpenThread?
 
 OpenThread released by Google is... <a href="https://www.threadgroup.org/What-is-Thread/Thread-Benefits#certifiedproducts"> <img src="https://cdn.rawgit.com/openthread/openthread/ab4c4e1e/doc/images/certified.svg" alt="Thread Certified Component" width="150px" align="right"> </a>
